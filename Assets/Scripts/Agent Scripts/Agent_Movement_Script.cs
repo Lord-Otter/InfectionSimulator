@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Agent_Script : MonoBehaviour
+public class Agent_Movement_Script : MonoBehaviour
 {
     public float moveSpeed;
     public float defaultMoveSpeed;
@@ -10,25 +10,11 @@ public class Agent_Script : MonoBehaviour
     public float defaultIdleTime;
     private Vector3 targetPosition;
 
-    private SpriteRenderer spriteRenderer;
-
-    private enum HealthState
-    {
-        Healthy,
-        Immune,
-        Compromised,
-        Infected,
-        Symptomatic,
-        Dead
-    }
-
     private enum MoveState
     {
         Idle,
         Moving
     }
-
-    private HealthState currentHealth = HealthState.Healthy;
     private MoveState currentMove = MoveState.Idle;
 
     // Start is called before the first frame update
@@ -40,9 +26,7 @@ public class Agent_Script : MonoBehaviour
         defaultIdleTime = idleTime;
 
         transform.position = GetTargetLocation();
-        spriteRenderer = GetComponent<SpriteRenderer>();
-
-        ChangeHealth(HealthState.Healthy);
+       
         ChangeMove(MoveState.Idle);
     }
 
@@ -52,17 +36,8 @@ public class Agent_Script : MonoBehaviour
 
     }
 
-    //Change Color of Agent
-    void ChangeColor(string hexColor)
-    {
-        if (ColorUtility.TryParseHtmlString(hexColor, out Color newColor))
-        {
-            spriteRenderer.color = newColor;
-        }
-    }
-
-//------Movement States ------------------------------------------------------------------------------------
-        private void ChangeMove(MoveState newState)
+    //------Movement States ------------------------------------------------------------------------------------
+    private void ChangeMove(MoveState newState)
     {
         StopAllCoroutines();
         currentMove = newState;
@@ -113,38 +88,6 @@ public class Agent_Script : MonoBehaviour
         float randomY = Random.Range(bottomLeft.y, topRight.y);
 
         return new Vector3(randomX, randomY, 0);
-    }
-
-//--Health States -------------------------------------------------------------------------------------------------------
-    private void ChangeHealth(HealthState newState)
-    {
-        currentHealth = newState;
-        switch (currentHealth)
-        {
-            case HealthState.Healthy:
-                ChangeColor("#00FF00");
-                break;
-
-            case HealthState.Immune:
-                ChangeColor("#FFFFFF");
-                break;
-
-            case HealthState.Compromised:
-                ChangeColor("#FFFF00");
-                break;
-
-            case HealthState.Infected:
-                ChangeColor("#FF8000");
-                break;
-
-            case HealthState.Symptomatic:
-                ChangeColor("#0000FF");
-                break;
-
-            case HealthState.Dead:
-                ChangeColor("#000000");
-                break;
-        }
     }
 }
 
