@@ -183,7 +183,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 50
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -223,7 +223,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1054135138}
-  - component: {fileID: 1054135139}
+  - component: {fileID: 1054135140}
   m_Layer: 0
   m_Name: Spawner
   m_TagString: Untagged
@@ -246,7 +246,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1054135139
+--- !u!114 &1054135140
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -258,9 +258,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a16fefd2c9b15fd478773c217c36fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfAgents: 50
+  numberOfAgents: 100
   spawnDelay: 0
-  Agent: {fileID: 5254144533200738005, guid: 0e53872230d52ce45be2c429a11d8b50, type: 3}
+  Agent: {fileID: 2529665201953887973, guid: 0e53872230d52ce45be2c429a11d8b50, type: 3}
 --- !u!1 &1629235645
 GameObject:
   m_ObjectHideFlags: 0
@@ -290,7 +290,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9abcf5620a3da747ab26f29390f8e58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeScale: 1
+  timeScale: 5
 --- !u!4 &1629235647
 Transform:
   m_ObjectHideFlags: 0

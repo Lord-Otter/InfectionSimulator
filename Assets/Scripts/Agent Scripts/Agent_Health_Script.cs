@@ -32,15 +32,6 @@ public class Agent_Health_Script : MonoBehaviour
         ChangeHealth(HealthState.Healthy);
         InfectedContact();
 
-        /*int startInfected = Random.Range(0, 99);
-        if (startInfected < (oddsOfInfection * 10))
-        {
-            ChangeHealth(HealthState.Infected);
-        }
-        else
-        {
-            ChangeHealth(HealthState.Healthy);
-        }*/
     }
 
     // Update is called once per frame
@@ -126,7 +117,7 @@ public class Agent_Health_Script : MonoBehaviour
         switch (currentHealth)
         {
             case HealthState.Healthy:
-                //ChangeColor("#00FF00");
+                ChangeColor("#00FF00");
                 SetInfectionRadiusCollider(false, 1.5f);
                 break;
 

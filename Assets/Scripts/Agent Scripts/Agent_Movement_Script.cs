@@ -6,6 +6,8 @@ public class Agent_Movement_Script : MonoBehaviour
 {
     public float moveSpeed;
     public float defaultMoveSpeed;
+    public float turnSpeed;
+    public float defaultTurnSpeed;
     public float idleTime;
     public float defaultIdleTime;
     private Vector3 targetPosition;
@@ -22,12 +24,14 @@ public class Agent_Movement_Script : MonoBehaviour
     {
         moveSpeed = 1.3f + Random.Range(-0.3f, 0.3f);
         defaultMoveSpeed = moveSpeed;
+        turnSpeed = 50f + Random.Range(-10f, 10f);
+        defaultTurnSpeed = turnSpeed;
         idleTime = Random.Range(0.5f, 1.5f);
         defaultIdleTime = idleTime;
 
         transform.position = GetTargetLocation();
        
-        ChangeMove(MoveState.Idle);
+        ChangeState(MoveState.Idle);
     }
 
     // Update is called once per frame
@@ -37,7 +41,7 @@ public class Agent_Movement_Script : MonoBehaviour
     }
 
     //------Movement States ------------------------------------------------------------------------------------
-    private void ChangeMove(MoveState newState)
+    private void ChangeState(MoveState newState)
     {
         StopAllCoroutines();
         currentMove = newState;
@@ -58,25 +62,31 @@ public class Agent_Movement_Script : MonoBehaviour
     IEnumerator IdleStateRoutine()
     {
         yield return new WaitForSeconds(idleTime);
-        ChangeMove(MoveState.Moving);
+        ChangeState(MoveState.Moving);
     }
 
     IEnumerator MoveToTarget()
+{
+    targetPosition = GetTargetLocation();
+
+    while (true)
     {
-        targetPosition = GetTargetLocation();
+        Vector3 direction = (targetPosition - transform.position).normalized;
 
-        while (true)
+        Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+
+        transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
+
+        if (Vector3.Distance(transform.position, targetPosition) < 2f)
         {
-            transform.position = Vector3.MoveTowards(transform.position, targetPosition, moveSpeed * Time.deltaTime);
-
-            if (Vector3.Distance(transform.position, targetPosition) < 0.1f)
-            {
-                ChangeMove(MoveState.Idle);
-            }
-
-            yield return null;
+            ChangeState(MoveState.Idle);
         }
+
+        yield return null;
     }
+}
 
     Vector3 GetTargetLocation()
     {
