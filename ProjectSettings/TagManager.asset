@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Infection
   - Agent
+  - Border
   layers:
   - Default
   - TransparentFX

@@ -80,7 +80,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -104,7 +104,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   resistance: 0
   defaultResistance: 0
-  oddsOfInfection: 0.1
+  oddsOfInfection: 1
+  oddsOfSymptomatic: 0.7
 --- !u!114 &7352436982632469455
 MonoBehaviour:
   m_ObjectHideFlags: 0

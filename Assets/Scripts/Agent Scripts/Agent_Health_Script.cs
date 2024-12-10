@@ -10,14 +10,19 @@ public class Agent_Health_Script : MonoBehaviour
     private SpriteRenderer spriteRenderer;
 
     public float oddsOfInfection = 0.1f;
+    public float oddsOfSymptomatic = 0.7f;
+    public float oddsOfCritical = 0.2f;
+    public float oddsOfDead = 0.7f;
 
     private enum HealthState
     {
         Healthy,
         Immune,
+        Resistant,
         Compromised,
         Infected,
         Symptomatic,
+        Critical,
         Dead
     }
     private HealthState currentHealth = HealthState.Healthy;
@@ -29,7 +34,7 @@ public class Agent_Health_Script : MonoBehaviour
 
         spriteRenderer = GetComponent<SpriteRenderer>();
 
-        ChangeHealth(HealthState.Healthy);
+        ChangeState(HealthState.Healthy);
         InfectedContact();
 
     }
@@ -57,62 +62,11 @@ public class Agent_Health_Script : MonoBehaviour
         }
     }
 
-    //Change Color of Agent
-    void ChangeColor(string hexColor)
+//--States----------------------------------------------------
+    private void ChangeState(HealthState newState)
     {
-        if (ColorUtility.TryParseHtmlString(hexColor, out Color newColor))
-        {
-            spriteRenderer.color = newColor;
-        }
-    }
-
-    void InfectedContact()
-    {
-        float infectionRoll = Random.Range(0, 99);
-        if (infectionRoll < (oddsOfInfection * resistance * 100))
-        {
-            ChangeHealth(HealthState.Infected);
-        }
-    }
-
-    bool SetInfectionRadiusCollider(bool isEnabled, float newRadius)
-    {
-        // Find the child named Infection_Radius
-        Transform infectionRadiusTransform = transform.Find("Infection_Radius");
-        if (infectionRadiusTransform != null)
-        {
-            // Get the CircleCollider2D component on Infection_Radius
-            CircleCollider2D circleCollider = infectionRadiusTransform.GetComponent<CircleCollider2D>();
-            if (circleCollider != null)
-            {
-                // Enable or disable the collider
-                circleCollider.enabled = isEnabled;
-
-                // If a valid new radius is provided, adjust the radius
-                if (newRadius >= 0)
-                {
-                    circleCollider.radius = newRadius;
-                }
-
-                // Return true if the operation was successful
-                return true;
-            }
-            else
-            {
-                Debug.LogWarning("CircleCollider2D component not found on Infection_Radius!");
-            }
-        }
-        else
-        {
-            Debug.LogWarning("Infection_Radius child not found!");
-        }
-
-        // Return false if the operation failed
-        return false;
-    }
-
-    private void ChangeHealth(HealthState newState)
-    {
+        StopAllCoroutines();
+        Debug.Log("Stopping Coroutines");
         currentHealth = newState;
         switch (currentHealth)
         {
@@ -126,17 +80,26 @@ public class Agent_Health_Script : MonoBehaviour
                 break;
 
             case HealthState.Compromised:
-                ChangeColor("#FFFF00");
+                ChangeColor("#80FF00");
                 break;
 
             case HealthState.Infected:
-                ChangeColor("#FF8000");
+                ChangeColor("#FFFF00");
                 SetInfectionRadiusCollider(true, 1.5f);
+
+                StartCoroutine(InfectedStage());
                 break;
 
             case HealthState.Symptomatic:
-                ChangeColor("#0000FF");
-                //SetInfectionRadiusCollider(true, 2.5f);
+                ChangeColor("#FF8000");
+                SetInfectionRadiusCollider(true, 2.5f);
+
+                StartCoroutine(SymptomaticStage());
+                break;
+
+            case HealthState.Critical:
+                ChangeColor("0000FF");
+                SetInfectionRadiusCollider(true, 2.5f);
                 break;
 
             case HealthState.Dead:
@@ -144,4 +107,123 @@ public class Agent_Health_Script : MonoBehaviour
                 break;
         }
     }
+
+    //--Change Color of Agent----------------------------------------------------------
+    void ChangeColor(string hexColor)
+    {
+        if (ColorUtility.TryParseHtmlString(hexColor, out Color newColor))
+        {
+            // Change color of the parent object (spriteRenderer)
+            spriteRenderer.color = newColor;
+
+            // Find the child object "Triangle" and change its color
+            Transform triangleTransform = transform.Find("Triangle");
+            if (triangleTransform != null)
+            {
+                SpriteRenderer triangleRenderer = triangleTransform.GetComponent<SpriteRenderer>();
+                if (triangleRenderer != null)
+                {
+                    triangleRenderer.color = newColor;
+                }
+            }
+        }
+    }
+
+    //--Collides with infection circle-----------------------------------------
+    void InfectedContact()
+    {
+        float infectionRoll = Random.Range(0, 99);
+        if (infectionRoll < (oddsOfInfection * resistance * 100) && currentHealth != HealthState.Immune)
+        {
+            ChangeState(HealthState.Infected);
+        }
+    }
+
+//--Infection Stage behaviour--------------------------------------------------------------------
+    IEnumerator InfectedStage()
+    {
+        int i = 10;
+        while (true)
+        {
+            int escalationRoll = Random.Range(0, 99);
+            if (escalationRoll < i * resistance)
+            {
+                int fateRoll = Random.Range(0, 99);
+                if (fateRoll < oddsOfSymptomatic * resistance * 100)
+                {
+                    Debug.Log("Infection Successfully Escalated");
+                    ChangeState(HealthState.Symptomatic);
+                }
+                else
+                {
+                    Debug.Log("Infection Failed To Escalate");
+                    ChangeState(HealthState.Healthy);
+                    
+                }
+            }
+            Debug.Log("Failed to Escalate. i = " + i);
+            i += 10;
+            yield return new WaitForSeconds(5);
+        }
+    }
+
+//--Symptomatic Stage Behaviour------------------------------------------------------------------------------
+    IEnumerator SymptomaticStage()
+    {
+        while (true)
+        {
+            int immunityRoll = Random.Range(0, 99);
+            if(immunityRoll == 99)
+            {
+                ChangeState (HealthState.Immune);
+            }
+            else
+            {
+                int fateRoll = Random.Range(0, 99);
+                if(fateRoll < oddsOfCritical * resistance * 100)
+                {
+                    ChangeState(HealthState.Critical);
+                }
+                else
+                {
+                    ChangeState(HealthState.Healthy);
+                }
+            }
+
+            yield return new WaitForSeconds(5);
+        }
+    }
+
+//--Change infection Circle-----------------------------------------------------------------------------------
+    bool SetInfectionRadiusCollider(bool isEnabled, float newRadius)
+    {
+        Transform infectionRadiusTransform = transform.Find("Infection_Radius");
+        if (infectionRadiusTransform != null)
+        {
+            CircleCollider2D circleCollider = infectionRadiusTransform.GetComponent<CircleCollider2D>();
+            if (circleCollider != null)
+            {
+                circleCollider.enabled = isEnabled;
+
+                if (newRadius >= 0)
+                {
+                    circleCollider.radius = newRadius;
+                }
+
+                return true;
+            }
+            else
+            {
+                Debug.LogWarning("CircleCollider2D component not found on Infection_Radius!");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Infection_Radius child not found!");
+        }
+
+        return false;
+    }
+
+    
 }
