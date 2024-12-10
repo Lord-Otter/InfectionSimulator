@@ -4,8 +4,10 @@ using UnityEngine;
 
 public class Agent_Health_Script : MonoBehaviour
 {
-    public float resistance;
-    public float defaultResistance;
+    public float infectionResistance;
+    private float resistance;
+    public float baseResistance;
+    public float fateRollCooldown;
 
     private SpriteRenderer spriteRenderer;
 
@@ -18,7 +20,6 @@ public class Agent_Health_Script : MonoBehaviour
     {
         Healthy,
         Immune,
-        Resistant,
         Compromised,
         Infected,
         Symptomatic,
@@ -29,8 +30,9 @@ public class Agent_Health_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        resistance = 1f + Random.Range(-0.3f, 0.3f);
-        defaultResistance = resistance;
+        infectionResistance = 1f + Random.Range(-0.3f, 0.3f);
+        resistance = 2 - infectionResistance;
+        baseResistance = resistance;
 
         spriteRenderer = GetComponent<SpriteRenderer>();
 
@@ -54,11 +56,6 @@ public class Agent_Health_Script : MonoBehaviour
             {
                 InfectedContact();
             }
-        }
-
-        if (other.CompareTag("Agent"))
-        {
-            //Collision with eachother.
         }
     }
 
@@ -98,25 +95,26 @@ public class Agent_Health_Script : MonoBehaviour
                 break;
 
             case HealthState.Critical:
-                ChangeColor("0000FF");
+                ChangeColor("#FF0000");
                 SetInfectionRadiusCollider(true, 2.5f);
+
+                StartCoroutine(CriticalStage());
                 break;
 
-            case HealthState.Dead:
+            case HealthState.Dead:                
                 ChangeColor("#000000");
+                SetInfectionRadiusCollider(false, 2.5f);
                 break;
         }
     }
 
-    //--Change Color of Agent----------------------------------------------------------
+//--Change Color of Agent----------------------------------------------------------
     void ChangeColor(string hexColor)
     {
         if (ColorUtility.TryParseHtmlString(hexColor, out Color newColor))
         {
-            // Change color of the parent object (spriteRenderer)
             spriteRenderer.color = newColor;
 
-            // Find the child object "Triangle" and change its color
             Transform triangleTransform = transform.Find("Triangle");
             if (triangleTransform != null)
             {
@@ -129,7 +127,7 @@ public class Agent_Health_Script : MonoBehaviour
         }
     }
 
-    //--Collides with infection circle-----------------------------------------
+//--Collides with infection circle-----------------------------------------
     void InfectedContact()
     {
         float infectionRoll = Random.Range(0, 99);
@@ -142,55 +140,91 @@ public class Agent_Health_Script : MonoBehaviour
 //--Infection Stage behaviour--------------------------------------------------------------------
     IEnumerator InfectedStage()
     {
-        int i = 10;
+        int i = 0;
         while (true)
         {
-            int escalationRoll = Random.Range(0, 99);
-            if (escalationRoll < i * resistance)
+            int escalationRoll = Random.Range(0, 9);
+            if (escalationRoll < i)
             {
                 int fateRoll = Random.Range(0, 99);
                 if (fateRoll < oddsOfSymptomatic * resistance * 100)
                 {
-                    Debug.Log("Infection Successfully Escalated");
+                    Debug.Log("Infected Successfully Escalated");
                     ChangeState(HealthState.Symptomatic);
                 }
                 else
                 {
-                    Debug.Log("Infection Failed To Escalate");
+                    Debug.Log("Infected Was Defeated");
                     ChangeState(HealthState.Healthy);
                     
                 }
             }
-            Debug.Log("Failed to Escalate. i = " + i);
-            i += 10;
-            yield return new WaitForSeconds(5);
+
+            Debug.Log("Infected Failed to Escalate. Odds: " + i + "0%");
+            ++i;
+            yield return new WaitForSeconds(fateRollCooldown);
         }
     }
 
 //--Symptomatic Stage Behaviour------------------------------------------------------------------------------
     IEnumerator SymptomaticStage()
     {
+        int i = 0;
         while (true)
         {
-            int immunityRoll = Random.Range(0, 99);
-            if(immunityRoll == 99)
-            {
-                ChangeState (HealthState.Immune);
-            }
-            else
+            int escalationRoll = Random.Range(0, 9);
+            if (escalationRoll < i) 
             {
                 int fateRoll = Random.Range(0, 99);
-                if(fateRoll < oddsOfCritical * resistance * 100)
+                if (fateRoll < oddsOfCritical * resistance * 100)
                 {
-                    ChangeState(HealthState.Critical);
+                    Debug.Log("Symptomatic Sucessfully Escalated");
+                    ChangeState(HealthState.Critical);                    
                 }
                 else
                 {
+                    Debug.Log("Symptomatic Was Defeated");
+                    ChangeState(HealthState.Healthy);
+                }                
+            }
+
+            Debug.Log("Symptomatic Failed to Escalate. Odds: " + i + "0%");
+            ++i;
+            yield return new WaitForSeconds(fateRollCooldown);
+        }
+    }
+
+    //--Critical Stage Behaviour-----------------------------------------------------------------------------------
+    IEnumerator CriticalStage()
+    {
+        int immunityRoll = Random.Range(0, 99);
+        if (immunityRoll == 99)
+        {
+            ChangeState(HealthState.Immune);
+        }
+
+        int i = 0;
+        while (true)
+        {
+            int escalationRoll = Random.Range(0, 9);
+            if (escalationRoll < i)
+            {
+                int fateRoll = Random.Range(0, 99);
+                if (fateRoll < oddsOfDead * resistance * 100)
+                {
+                    Debug.Log("Critical Sucessfully Escalated");
+                    ChangeState(HealthState.Dead);
+                }
+                else
+                {
+                    Debug.Log("Critical Was Defeated");
                     ChangeState(HealthState.Healthy);
                 }
             }
 
-            yield return new WaitForSeconds(5);
+            Debug.Log("Critical Failed to Escalate. Odds: " + i + "0%");
+            ++i;
+            yield return new WaitForSeconds(fateRollCooldown);
         }
     }
 
@@ -223,7 +257,5 @@ public class Agent_Health_Script : MonoBehaviour
         }
 
         return false;
-    }
-
-    
+    }   
 }

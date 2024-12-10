@@ -5,11 +5,11 @@ using UnityEngine;
 public class Agent_Movement_Script : MonoBehaviour
 {
     public float moveSpeed;
-    public float defaultMoveSpeed;
+    public float baseMoveSpeed;
     public float turnSpeed;
-    public float defaultTurnSpeed;
+    public float baseTurnSpeed;
     public float idleTime;
-    public float defaultIdleTime;
+    public float baseIdleTime;
 
     private Vector3 targetPosition;
     GameObject worldBorderObject;
@@ -30,11 +30,11 @@ public class Agent_Movement_Script : MonoBehaviour
         transform.position = GetTargetLocation();
 
         moveSpeed = 1.3f + Random.Range(-0.3f, 0.3f);
-        defaultMoveSpeed = moveSpeed;
+        baseMoveSpeed = moveSpeed;
         turnSpeed = 50f + Random.Range(-10f, 10f);
-        defaultTurnSpeed = turnSpeed;
+        baseTurnSpeed = turnSpeed;
         idleTime = Random.Range(0.5f, 1.5f);
-        defaultIdleTime = idleTime;
+        baseIdleTime = idleTime;
 
         ChangeState(MoveState.Idle);
     }
