@@ -6,7 +6,7 @@ public class Agent_Health_Script : MonoBehaviour
 {
     public float infectionResistance;
     private float resistance;
-    public float baseResistance;
+    private float baseResistance;
     public float fateRollCooldown;
 
     private SpriteRenderer spriteRenderer;
@@ -30,7 +30,7 @@ public class Agent_Health_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        infectionResistance = 1f + Random.Range(-0.3f, 0.3f);
+        infectionResistance = Mathf.Round(Random.Range(0.7f, 1.3f) * 100f) / 100f;
         resistance = 2 - infectionResistance;
         baseResistance = resistance;
 
@@ -130,7 +130,7 @@ public class Agent_Health_Script : MonoBehaviour
 //--Collides with infection circle-----------------------------------------
     void InfectedContact()
     {
-        float infectionRoll = Random.Range(0, 99);
+        float infectionRoll = Random.Range(0, 100);
         if (infectionRoll < (oddsOfInfection * resistance * 100) && currentHealth != HealthState.Immune)
         {
             ChangeState(HealthState.Infected);
@@ -143,10 +143,10 @@ public class Agent_Health_Script : MonoBehaviour
         int i = 0;
         while (true)
         {
-            int escalationRoll = Random.Range(0, 9);
+            int escalationRoll = Random.Range(0, 10);
             if (escalationRoll < i)
             {
-                int fateRoll = Random.Range(0, 99);
+                int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfSymptomatic * resistance * 100)
                 {
                     Debug.Log("Infected Successfully Escalated");
@@ -172,10 +172,10 @@ public class Agent_Health_Script : MonoBehaviour
         int i = 0;
         while (true)
         {
-            int escalationRoll = Random.Range(0, 9);
+            int escalationRoll = Random.Range(0, 10);
             if (escalationRoll < i) 
             {
-                int fateRoll = Random.Range(0, 99);
+                int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfCritical * resistance * 100)
                 {
                     Debug.Log("Symptomatic Sucessfully Escalated");
@@ -197,8 +197,8 @@ public class Agent_Health_Script : MonoBehaviour
     //--Critical Stage Behaviour-----------------------------------------------------------------------------------
     IEnumerator CriticalStage()
     {
-        int immunityRoll = Random.Range(0, 99);
-        if (immunityRoll == 99)
+        int immunityRoll = Random.Range(0, 100);
+        if (immunityRoll == 0)
         {
             ChangeState(HealthState.Immune);
         }
@@ -206,10 +206,10 @@ public class Agent_Health_Script : MonoBehaviour
         int i = 0;
         while (true)
         {
-            int escalationRoll = Random.Range(0, 9);
+            int escalationRoll = Random.Range(0, 10);
             if (escalationRoll < i)
             {
-                int fateRoll = Random.Range(0, 99);
+                int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfDead * resistance * 100)
                 {
                     Debug.Log("Critical Sucessfully Escalated");

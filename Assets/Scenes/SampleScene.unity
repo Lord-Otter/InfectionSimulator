@@ -185,10 +185,10 @@ PolygonCollider2D:
   m_AutoTiling: 0
   m_Points:
     m_Paths:
-    - - {x: -120, y: 70}
-      - {x: -120, y: -70}
-      - {x: 120, y: -70}
-      - {x: 120, y: 70}
+    - - {x: -100, y: 60}
+      - {x: -100, y: -60}
+      - {x: 100, y: -60}
+      - {x: 100, y: 60}
   m_UseDelaunayMesh: 0
 --- !u!4 &225777436
 Transform:
@@ -473,7 +473,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a16fefd2c9b15fd478773c217c36fb8e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  numberOfAgents: 500
+  numberOfAgents: 250
   spawnDelay: 0
   Agent: {fileID: 2529665201953887973, guid: 0e53872230d52ce45be2c429a11d8b50, type: 3}
 --- !u!1 &1629235645

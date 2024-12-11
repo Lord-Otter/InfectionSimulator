@@ -29,11 +29,11 @@ public class Agent_Movement_Script : MonoBehaviour
         worldBorderObject = GameObject.Find("World_Border");
         transform.position = GetTargetLocation();
 
-        moveSpeed = 1.3f + Random.Range(-0.3f, 0.3f);
+        moveSpeed = Mathf.Round(Random.Range(0.7f, 1.3f) * 100f) / 100f;
         baseMoveSpeed = moveSpeed;
-        turnSpeed = 50f + Random.Range(-10f, 10f);
+        turnSpeed = Mathf.Round(Random.Range(40f, 60f) * 100f) / 100f;
         baseTurnSpeed = turnSpeed;
-        idleTime = Random.Range(0.5f, 1.5f);
+        idleTime = Mathf.Round(Random.Range(0.5f, 1.5f) * 100f) / 100f;
         baseIdleTime = idleTime;
 
         ChangeState(MoveState.Idle);
