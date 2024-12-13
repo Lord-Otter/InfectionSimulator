@@ -16,6 +16,8 @@ public class Agent_Health_Script : MonoBehaviour
     public float oddsOfCritical = 0.2f;
     public float oddsOfDead = 0.7f;
 
+    public Agent_Movement_Script moveScript;
+
     private enum HealthState
     {
         Healthy,
@@ -30,6 +32,8 @@ public class Agent_Health_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        moveScript = FindObjectOfType<Agent_Movement_Script>();
+
         infectionResistance = Mathf.Round(Random.Range(0.7f, 1.3f) * 100f) / 100f;
         resistance = 2 - infectionResistance;
         baseResistance = resistance;
@@ -63,7 +67,7 @@ public class Agent_Health_Script : MonoBehaviour
     private void ChangeState(HealthState newState)
     {
         StopAllCoroutines();
-        Debug.Log("Stopping Coroutines");
+        //Debug.Log("Stopping Coroutines");
         currentHealth = newState;
         switch (currentHealth)
         {
@@ -104,6 +108,7 @@ public class Agent_Health_Script : MonoBehaviour
             case HealthState.Dead:                
                 ChangeColor("#000000");
                 SetInfectionRadiusCollider(false, 2.5f);
+                StopAllMoveCoroutines();
                 break;
         }
     }
@@ -149,18 +154,18 @@ public class Agent_Health_Script : MonoBehaviour
                 int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfSymptomatic * resistance * 100)
                 {
-                    Debug.Log("Infected Successfully Escalated");
+                    //Debug.Log("Infected Successfully Escalated");
                     ChangeState(HealthState.Symptomatic);
                 }
                 else
                 {
-                    Debug.Log("Infected Was Defeated");
+                    //Debug.Log("Infected Was Defeated");
                     ChangeState(HealthState.Healthy);
                     
                 }
             }
 
-            Debug.Log("Infected Failed to Escalate. Odds: " + i + "0%");
+            //Debug.Log("Infected Failed to Escalate. Odds: " + i + "0%");
             ++i;
             yield return new WaitForSeconds(fateRollCooldown);
         }
@@ -178,17 +183,17 @@ public class Agent_Health_Script : MonoBehaviour
                 int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfCritical * resistance * 100)
                 {
-                    Debug.Log("Symptomatic Sucessfully Escalated");
+                    //Debug.Log("Symptomatic Sucessfully Escalated");
                     ChangeState(HealthState.Critical);                    
                 }
                 else
                 {
-                    Debug.Log("Symptomatic Was Defeated");
+                    //Debug.Log("Symptomatic Was Defeated");
                     ChangeState(HealthState.Healthy);
                 }                
             }
 
-            Debug.Log("Symptomatic Failed to Escalate. Odds: " + i + "0%");
+            //Debug.Log("Symptomatic Failed to Escalate. Odds: " + i + "0%");
             ++i;
             yield return new WaitForSeconds(fateRollCooldown);
         }
@@ -212,17 +217,17 @@ public class Agent_Health_Script : MonoBehaviour
                 int fateRoll = Random.Range(0, 100);
                 if (fateRoll < oddsOfDead * resistance * 100)
                 {
-                    Debug.Log("Critical Sucessfully Escalated");
+                    //Debug.Log("Critical Sucessfully Escalated");
                     ChangeState(HealthState.Dead);
                 }
                 else
                 {
-                    Debug.Log("Critical Was Defeated");
+                    //Debug.Log("Critical Was Defeated");
                     ChangeState(HealthState.Healthy);
                 }
             }
 
-            Debug.Log("Critical Failed to Escalate. Odds: " + i + "0%");
+            //Debug.Log("Critical Failed to Escalate. Odds: " + i + "0%");
             ++i;
             yield return new WaitForSeconds(fateRollCooldown);
         }
@@ -257,5 +262,11 @@ public class Agent_Health_Script : MonoBehaviour
         }
 
         return false;
-    }   
+    }
+
+//--Stop All Coroutines in Agent_Movement_Script----------------------------------------------------
+    public void StopAllMoveCoroutines()
+    {
+        moveScript.StopAllCoroutines();
+    }
 }

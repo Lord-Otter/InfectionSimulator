@@ -7,11 +7,12 @@ TagManager:
   - Infection
   - Agent
   - Border
+  - Nose
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Border
   - Water
   - UI
   - 

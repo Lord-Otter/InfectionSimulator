@@ -11,9 +11,13 @@ public class Agent_Movement_Script : MonoBehaviour
     public float idleTime;
     public float baseIdleTime;
 
-    private Vector3 targetPosition;
-    GameObject worldBorderObject;
+    public bool pathBlocked = false;
+    public float rayDistance = 2f;
 
+    private Vector3 targetPosition;
+    private Rigidbody2D rb;
+
+    GameObject worldBorderObject;
 
     private enum MoveState
     {
@@ -26,6 +30,7 @@ public class Agent_Movement_Script : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        rb = GetComponent<Rigidbody2D>();  // Get the Rigidbody2D component
         worldBorderObject = GameObject.Find("World_Border");
         transform.position = GetTargetLocation();
 
@@ -42,10 +47,10 @@ public class Agent_Movement_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 
-    //------Movement States ------------------------------------------------------------------------------------
+    //--Movement States------------------------------------------------------------------------------------
     private void ChangeState(MoveState newState)
     {
         StopAllCoroutines();
@@ -76,14 +81,49 @@ public class Agent_Movement_Script : MonoBehaviour
         {
             Vector3 direction = (targetPosition - transform.position).normalized;
 
-            Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+            if(pathBlocked == true)
+            {                
+                    RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, rayDistance);
+                    RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, rayDistance);
 
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+                    Debug.DrawRay(transform.position, transform.right * rayDistance, Color.green);
+                    Debug.DrawRay(transform.position, -transform.right * rayDistance, Color.red); 
 
-            transform.Translate(Vector3.up * moveSpeed * Time.deltaTime);
+                    if (hitRight.collider != null && hitLeft.collider != null)
+                    {
+                        if (hitRight.distance < hitLeft.distance)
+                        {
+                            transform.Rotate(0, 0, -turnSpeed * Time.deltaTime);
+                        }
+                        else
+                        {
+                            transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
+                        }
+                    }
+                    else if (hitRight.collider != null)
+                    {
+                        transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
+                    }
+                    else if (hitLeft.collider != null)
+                    {
+                        transform.Rotate(0, 0, -turnSpeed * Time.deltaTime);
+                    }
+                
+            }
+            else
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(Vector3.forward, direction);
+                transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+            }
+
+            Vector2 velocity = Vector2.up;
+            float angle = transform.eulerAngles.z;
+            velocity = Quaternion.Euler(0, 0, angle) * Vector2.up;
+            rb.velocity = velocity;
 
             if (Vector3.Distance(transform.position, targetPosition) < 2f)
             {
+                rb.velocity = Vector2.zero;
                 ChangeState(MoveState.Idle);
             }
 
@@ -93,29 +133,22 @@ public class Agent_Movement_Script : MonoBehaviour
 
     public Vector3 GetTargetLocation()
     {
-        // Get the PolygonCollider2D component from the referenced GameObject
         PolygonCollider2D worldBorder = worldBorderObject.GetComponent<PolygonCollider2D>();
 
-        // Get the points of the polygon
         Vector2[] colliderPoints = worldBorder.points;
 
-        // Find a random point inside the polygon
         Vector2 randomPoint = GetRandomPointInsidePolygon(colliderPoints);
 
-        // Convert the random point to world space (since the collider points are local to the object)
         Vector3 worldPoint = worldBorder.transform.TransformPoint(randomPoint);
 
         return worldPoint;
     }
 
-    // Method to get a random point inside a polygon
     private Vector2 GetRandomPointInsidePolygon(Vector2[] polygon)
     {
-        // Create a random point within the bounds of the polygon's bounding box
         Rect bounds = GetBounds(polygon);
         Vector2 randomPoint;
 
-        // Ensure the random point lies inside the polygon
         do
         {
             randomPoint = new Vector2(
@@ -127,7 +160,6 @@ public class Agent_Movement_Script : MonoBehaviour
         return randomPoint;
     }
 
-    // Method to check if a point is inside a polygon (raycasting technique)
     private bool IsPointInsidePolygon(Vector2 point, Vector2[] polygon)
     {
         int intersectionCount = 0;
@@ -140,14 +172,12 @@ public class Agent_Movement_Script : MonoBehaviour
                 intersectionCount++;
             }
         }
-        // If the number of intersections is odd, the point is inside the polygon
         return (intersectionCount % 2 != 0);
     }
 
-    // Check if a horizontal ray from the point intersects a segment of the polygon
     private bool IsRayIntersectingSegment(Vector2 point, Vector2 p1, Vector2 p2)
     {
-        if (p1.y > p2.y) 
+        if (p1.y > p2.y)
         {
             Vector2 temp = p1;
             p1 = p2;
@@ -164,7 +194,6 @@ public class Agent_Movement_Script : MonoBehaviour
         return point.x < xIntersection;
     }
 
-    // Get the bounding box of the polygon
     private Rect GetBounds(Vector2[] polygon)
     {
         float minX = Mathf.Infinity;
@@ -183,4 +212,3 @@ public class Agent_Movement_Script : MonoBehaviour
         return new Rect(minX, minY, maxX - minX, maxY - minY);
     }
 }
-
