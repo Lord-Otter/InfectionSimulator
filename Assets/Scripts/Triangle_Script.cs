@@ -8,16 +8,13 @@ public class Triangle_Script : MonoBehaviour
 
     void Start()
     {
-        // Get reference to the Agent_Movement_Script on the parent object
         agentMoveScript = transform.parent.GetComponent<Agent_Movement_Script>();
     }
 
-    // Detect collision with other objects
     public void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Nose") || other.CompareTag("Agent"))
         {
-            // Set pathBlocked to true when a collision with "Nose" or "Agent" occurs
             if (agentMoveScript != null)
             {
                 Debug.Log("Collision Detected");
@@ -30,7 +27,6 @@ public class Triangle_Script : MonoBehaviour
     {
         if (other.CompareTag("Nose") || other.CompareTag("Agent"))
         {
-            // Set pathBlocked to false when the collision ends
             if (agentMoveScript != null)
             {
                 Debug.Log("Collision Ended");

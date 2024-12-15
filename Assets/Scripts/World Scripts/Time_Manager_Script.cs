@@ -15,7 +15,6 @@ public class Time_Manager_Script : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Set the global time scale to the value of timeScale
         Time.timeScale = timeScale;
 
         if (Input.GetKeyDown(KeyCode.Space))
@@ -44,11 +43,10 @@ public class Time_Manager_Script : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            timeScale = 30;
+            timeScale = 15;
         }
     }
 
-    // A method to change the time scale dynamically (could be called from other scripts or UI)
     public void SetTimeScale(float newTimeScale)
     {
         timeScale = newTimeScale;
