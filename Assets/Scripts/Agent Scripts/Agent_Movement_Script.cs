@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 public class Agent_Movement_Script : MonoBehaviour
@@ -77,38 +78,41 @@ public class Agent_Movement_Script : MonoBehaviour
     {
         targetPosition = GetTargetLocation();
 
+        var initialTarget = targetPosition;
+
         while (true)
         {
             Vector3 direction = (targetPosition - transform.position).normalized;
 
             if(pathBlocked == true)
-            {                
-                    RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, rayDistance);
-                    RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, rayDistance);
+            {
+                RaycastHit2D hitRight = Physics2D.Raycast(transform.position, transform.right, rayDistance);
+                RaycastHit2D hitLeft = Physics2D.Raycast(transform.position, -transform.right, rayDistance);
 
-                    Debug.DrawRay(transform.position, transform.right * rayDistance, Color.green);
-                    Debug.DrawRay(transform.position, -transform.right * rayDistance, Color.red); 
+                Debug.DrawRay(transform.position, transform.right * rayDistance, Color.green);
+                Debug.DrawRay(transform.position, -transform.right * rayDistance, Color.red); 
 
-                    if (hitRight.collider != null && hitLeft.collider != null)
-                    {
-                        if (hitRight.distance < hitLeft.distance)
-                        {
-                            transform.Rotate(0, 0, -turnSpeed * Time.deltaTime);
-                        }
-                        else
-                        {
-                            transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
-                        }
-                    }
-                    else if (hitRight.collider != null)
-                    {
-                        transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
-                    }
-                    else if (hitLeft.collider != null)
+                if (hitRight.collider != null && hitLeft.collider != null)
+                {
+                    if (hitRight.distance < hitLeft.distance)
                     {
                         transform.Rotate(0, 0, -turnSpeed * Time.deltaTime);
                     }
-                
+                    else
+                    {
+                        transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
+
+
+                    }
+                }
+                else if (hitRight.collider != null)
+                {
+                    transform.Rotate(0, 0, turnSpeed * Time.deltaTime);
+                }
+                else if (hitLeft.collider != null)
+                {
+                    transform.Rotate(0, 0, -turnSpeed * Time.deltaTime);
+                }               
             }
             else
             {

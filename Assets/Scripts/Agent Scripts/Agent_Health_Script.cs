@@ -78,6 +78,7 @@ public class Agent_Health_Script : MonoBehaviour
 
             case HealthState.Immune:
                 ChangeColor("#FFFFFF");
+                SetInfectionRadiusCollider(false, 1.5f);
                 break;
 
             case HealthState.Compromised:
@@ -105,9 +106,10 @@ public class Agent_Health_Script : MonoBehaviour
                 StartCoroutine(CriticalStage());
                 break;
 
-            case HealthState.Dead:                
+            case HealthState.Dead:
                 ChangeColor("#000000");
                 SetInfectionRadiusCollider(false, 2.5f);
+
                 StopAllMoveCoroutines();
                 break;
         }

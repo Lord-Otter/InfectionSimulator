@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class Spawn_Script : MonoBehaviour
 {
-    public int numberOfAgents;
+    public int totalPopulation;
     public float spawnDelay;
 
     public GameObject Agent;
@@ -24,7 +24,7 @@ public class Spawn_Script : MonoBehaviour
 
     IEnumerator SpawnAgent()
     {
-        for (int i = 1; i <= numberOfAgents; i++)
+        for (int i = 1; i <= totalPopulation; i++)
         {
             Instantiate(Agent);
             yield return new WaitForSeconds(spawnDelay);
