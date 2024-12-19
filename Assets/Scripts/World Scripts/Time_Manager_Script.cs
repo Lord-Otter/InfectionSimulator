@@ -43,7 +43,7 @@ public class Time_Manager_Script : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Alpha3))
         {
-            timeScale = 15;
+            timeScale = 10;
         }
     }
 

@@ -27,6 +27,7 @@ public class Agent_Movement_Script : MonoBehaviour
         PlayerControl
     }
     private MoveState currentMove = MoveState.Idle;
+    internal bool pathblocked;
 
     // Start is called before the first frame update
     void Start()

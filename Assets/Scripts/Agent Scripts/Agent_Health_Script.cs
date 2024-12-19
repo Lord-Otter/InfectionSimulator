@@ -18,6 +18,8 @@ public class Agent_Health_Script : MonoBehaviour
 
     public Agent_Movement_Script moveScript;
 
+    private Spawn_Script spawner;
+
     private enum HealthState
     {
         Healthy,
@@ -29,9 +31,12 @@ public class Agent_Health_Script : MonoBehaviour
         Dead
     }
     private HealthState currentHealth = HealthState.Healthy;
+
     // Start is called before the first frame update
     void Start()
     {
+        spawner = FindObjectOfType<Spawn_Script>();
+
         moveScript = FindObjectOfType<Agent_Movement_Script>();
 
         infectionResistance = Mathf.Round(Random.Range(0.7f, 1.3f) * 100f) / 100f;
@@ -74,21 +79,27 @@ public class Agent_Health_Script : MonoBehaviour
             case HealthState.Healthy:
                 ChangeColor("#00FF00");
                 SetInfectionRadiusCollider(false, 1.5f);
+
+                spawner.GetComponent<Spawn_Script>().healthyCounter++;
                 break;
 
             case HealthState.Immune:
                 ChangeColor("#FFFFFF");
                 SetInfectionRadiusCollider(false, 1.5f);
+
+                spawner.GetComponent<Spawn_Script>().immuneCounter++;
                 break;
 
             case HealthState.Compromised:
                 ChangeColor("#80FF00");
+                //Unused.
                 break;
 
             case HealthState.Infected:
                 ChangeColor("#FFFF00");
                 SetInfectionRadiusCollider(true, 1.5f);
 
+                spawner.GetComponent<Spawn_Script>().infectedCounter++;
                 StartCoroutine(InfectedStage());
                 break;
 
@@ -96,6 +107,7 @@ public class Agent_Health_Script : MonoBehaviour
                 ChangeColor("#FF8000");
                 SetInfectionRadiusCollider(true, 2.5f);
 
+                spawner.GetComponent<Spawn_Script>().symptomaticCounter++;
                 StartCoroutine(SymptomaticStage());
                 break;
 
@@ -103,6 +115,7 @@ public class Agent_Health_Script : MonoBehaviour
                 ChangeColor("#FF0000");
                 SetInfectionRadiusCollider(true, 2.5f);
 
+                spawner.GetComponent<Spawn_Script>().criticalCounter++;
                 StartCoroutine(CriticalStage());
                 break;
 
@@ -110,6 +123,8 @@ public class Agent_Health_Script : MonoBehaviour
                 ChangeColor("#000000");
                 SetInfectionRadiusCollider(false, 2.5f);
 
+                spawner.GetComponent<Spawn_Script>().deadCounter++;
+                spawner.GetComponent<Spawn_Script>().aliveCounter--;
                 StopAllMoveCoroutines();
                 break;
         }
@@ -140,6 +155,7 @@ public class Agent_Health_Script : MonoBehaviour
         float infectionRoll = Random.Range(0, 100);
         if (infectionRoll < (oddsOfInfection * resistance * 100) && currentHealth != HealthState.Immune)
         {
+            spawner.GetComponent<Spawn_Script>().healthyCounter--;
             ChangeState(HealthState.Infected);
         }
     }
@@ -165,6 +181,7 @@ public class Agent_Health_Script : MonoBehaviour
                     ChangeState(HealthState.Healthy);
                     
                 }
+                spawner.GetComponent<Spawn_Script>().infectedCounter--;
             }
 
             //Debug.Log("Infected Failed to Escalate. Odds: " + i + "0%");
@@ -192,7 +209,8 @@ public class Agent_Health_Script : MonoBehaviour
                 {
                     //Debug.Log("Symptomatic Was Defeated");
                     ChangeState(HealthState.Healthy);
-                }                
+                }
+                spawner.GetComponent<Spawn_Script>().symptomaticCounter--;
             }
 
             //Debug.Log("Symptomatic Failed to Escalate. Odds: " + i + "0%");
@@ -207,6 +225,7 @@ public class Agent_Health_Script : MonoBehaviour
         int immunityRoll = Random.Range(0, 100);
         if (immunityRoll == 0)
         {
+            spawner.GetComponent<Spawn_Script>().criticalCounter--;
             ChangeState(HealthState.Immune);
         }
 
@@ -227,6 +246,7 @@ public class Agent_Health_Script : MonoBehaviour
                     //Debug.Log("Critical Was Defeated");
                     ChangeState(HealthState.Healthy);
                 }
+                spawner.GetComponent<Spawn_Script>().criticalCounter--;
             }
 
             //Debug.Log("Critical Failed to Escalate. Odds: " + i + "0%");
