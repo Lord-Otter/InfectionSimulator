@@ -106,8 +106,8 @@ MonoBehaviour:
   fateRollCooldown: 10
   oddsOfInfection: 0.2
   oddsOfSymptomatic: 0.7
-  oddsOfCritical: 0.1
-  oddsOfDead: 0.4
+  oddsOfCritical: 0.3
+  oddsOfDead: 0.2
   moveScript: {fileID: 0}
 --- !u!114 &7352436982632469455
 MonoBehaviour:
@@ -356,6 +356,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b767f8bbaa76c7d418b0250f2ff7e788, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mainCamera: {fileID: 0}
 --- !u!61 &7535278940666830257
 BoxCollider2D:
   m_ObjectHideFlags: 0

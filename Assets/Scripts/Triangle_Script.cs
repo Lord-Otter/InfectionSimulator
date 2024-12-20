@@ -35,7 +35,29 @@ public class Triangle_Script : MonoBehaviour
         }
     }
 
-    public void OnTriggerStay2D(Collider2D other)
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Nose") || other.CompareTag("Agent"))
+        {
+            if (agentMoveScript != null)
+            {
+                agentMoveScript.pathBlocked = true;
+            }
+        }
+    }
+
+    public void OnTriggerExit2D(Collider2D other)
+    {
+        if (other.CompareTag("Nose") || other.CompareTag("Agent"))
+        {
+            if (agentMoveScript != null)
+            {
+                agentMoveScript.pathBlocked = false;
+            }
+        }
+    }
+
+    /*public void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Nose") || other.CompareTag("Agent"))
         {
@@ -51,7 +73,7 @@ public class Triangle_Script : MonoBehaviour
                 agentMoveScript.pathBlocked = false;
             }
         }
-    }
+    }*/
 
     private bool IsInCameraView()
     {
